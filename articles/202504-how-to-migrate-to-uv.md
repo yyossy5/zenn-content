@@ -81,13 +81,13 @@ installing to /home/ec2-user/.local/bin
 everything's installed!
 ```
 
-# 既存プロジェクトのuv管理への移行手順
+# 既存プロジェクト(my-python-repo)のuv管理への移行手順
 
 上記のような構成で管理されているmy-python-repoというリポジトリをuv管理へ移行すると想定します。
 
 https://docs.astral.sh/uv/guides/projects/
 
-## 1. リポジトリで`uv init` & Pythonバージョンの設定
+## 1. `uv init` & Pythonバージョンの設定
 
 プロジェクトルートで以下を実行することで、Python3.13.2を使用するuv管理のプロジェクトとして初期化します。
 
@@ -193,7 +193,7 @@ $ uv add -r requirements-new-dev.txt --dev
 ただ、`--frozen`を使うと、lockファイルへ記録されない代わりに、無理やり追加はできます[^4]。
 どうしてもこのまま追加したい場合は、my-python-test-libsのpandasの使い方起因のランタイムエラーが出る可能性があることを理解したうえで行うと良いと思います。
 
-## 3. my-python-repoをテストする
+## 3. テストする
 
 uv移行後正しく動作するのか、アプリケーションを実行したり自動テストを実行して確認します。
 例えば、uv管理のPythonアプリケーションを動かすには以下のように`uv run`を実行します。
