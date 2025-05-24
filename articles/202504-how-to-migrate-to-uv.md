@@ -81,7 +81,7 @@ installing to /home/ec2-user/.local/bin
 everything's installed!
 ```
 
-# 既存プロジェクト(my-python-repo)のuv管理への移行手順
+# 既存プロジェクトのuv管理への移行手順
 
 上記のような構成で管理されているmy-python-repoというリポジトリをuv管理へ移行すると想定します。
 
