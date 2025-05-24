@@ -22,10 +22,11 @@ npx zenn preview
 
 ### 記事の公開
 
+markdown上で`published: true`にしておく(`false`にしておくと下書き状態）。
+その後以下を実行
+
 ```bash
 git add .
 git commit
 git push origin main
 ```
-
-その後、ZennのWebサイトで記事を`published: true`に変更すると、記事が公開される。
