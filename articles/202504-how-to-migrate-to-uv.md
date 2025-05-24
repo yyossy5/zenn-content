@@ -87,7 +87,7 @@ everything's installed!
 
 https://docs.astral.sh/uv/guides/projects/
 
-## 1. リポジトリで`un init` & Pythonバージョンの設定
+## 1. リポジトリで`uv init` & Pythonバージョンの設定
 
 プロジェクトルートで以下を実行することで、Python3.13.2を使用するuv管理のプロジェクトとして初期化します。
 
