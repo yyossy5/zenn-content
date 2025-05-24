@@ -1,5 +1,5 @@
 ---
-title: "既存Pythonプロジェクトをuv管理へ移行する方法"
+title: "既存Pythonプロジェクトをuv管理へ移行する動機と方法"
 emoji: "🎉"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [python, uv]
