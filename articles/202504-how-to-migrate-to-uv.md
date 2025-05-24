@@ -10,6 +10,8 @@ published: false
 
 既存Pythonプロジェクトをuv管理へ移行する動機やその方法を記載します。
 
+注：本記事の内容はuvのv0.6.13時の情報に基づきます。
+
 # よくある既存構成
 
 既存Pythonプロジェクトはここではよくある以下の構成を想定とします。
@@ -39,6 +41,131 @@ uvというPython開発環境管理ツールを使うと、上記課題は解決
 uvの場合Pythonのバージョン管理まで出来るのでuv以外のツールは不要であることや、超高速に動作することなどにそれらと比較した強みがあります。
 uvはver0系ではあるのですがステータスとしてはすでに[Stable](https://github.com/astral-sh/uv/issues/8941)とされており、個人的にもコア機能は既に安定しているのではないかと思っています。
 
+# 準備: uvのインストール
+
+https://docs.astral.sh/uv/getting-started/installation/
+
+上記からスタンドアロン版をインストールしてください（`pip install` で入れるとPython環境に紐づいてしまうのでスタンドアロン版を入れられるならそちらが良いとおもいます）
+
+```bash
+$ curl -LsSf https://astral.sh/uv/install.sh | sh
+downloading uv 0.6.13 x86_64-unknown-linux-gnu
+no checksums to verify
+installing to /home/ec2-user/.local/bin
+  uv
+  uvx
+everything's installed!
+```
+
+# 既存プロジェクトのuv管理への移行手順
+
+上記のような構成で管理されているmy-python-repoというリポジトリをuv管理へ移行すると想定します。
+
+https://docs.astral.sh/uv/guides/projects/
+
+## 1. リポジトリで`un init` & Pythonバージョンの設定
+
+プロジェクトルートで以下を実行することで、Python3.13.2を使用するuv管理のプロジェクトとして初期化します。
+
+```bash
+$ uv init -p 3.13.2
+Initialized project `my-python-repo`
+```
+
+すると、`main.py`, `pyproject.toml`, `.python-version`, `README.md` が作られます。
+
+`main.py`
+
+```python
+def main():
+    print("Hello from my-python-repo!")
+
+if __name__ == "__main__":
+    main()
+```
+
+`pyproject.toml`
+
+```python
+[project]
+name = "my-python-repo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13.2"
+dependencies = []
+```
+
+`.python-version`
+
+```
+3.13.2
+```
+
+`uv run main.py`を実行してみると、仮想環境(.venvディレクトリ[^3])と`uv.lock`が作成されます。
+
+```bash
+$ uv run main.py
+Using CPython 3.13.2
+Creating virtual environment at: .venv
+Hello from my-python-repo!
+```
+
+`main.py`は要らないので、消して良いです。
+また、`pyproject.toml`のプロジェクト名等のメタ情報は必要に応じて書き換えておくと良いかと思います。
+
+## 2. 依存ライブラリを`pyproject.toml`に追加する
+
+https://docs.astral.sh/uv/guides/projects/#managing-dependencies
+
+`requirements.txt`からの移行は`uv add -r`で出来ますが、まず`requirements.txt`に機能として必要なライブラリと、開発にのみ必要なライブラリが混在している場合は、2つに分けます。
+
+例：
+
+`requirements-new-lib.txt`
+
+```
+pyarrow==19.0.1
+pandas==2.2.3
+lightgbm==4.6.0
+...
+```
+
+`requirements-new-dev.txt`
+
+```
+moto==5.1.3
+my-python-test-libs==1.4.2
+...
+```
+
+上記を使って、以下のコマンドで`pyproject.toml`に依存ライブラリを追加します。
+
+```bash
+$ uv add -r requirements-new-lib.txt
+$ uv add -r requirements-new-dev.txt --dev
+```
+
+なお、矛盾する依存関係が存在しており解決できない場合は、以下のようなエラーが出ます。
+例えば、上記の例のようにmy-python-test-libsというリポジトリ(架空のものです)があって、
+それがpandas2.0.0未満を要求している場合、`pandas==2.2.3`とコンフリクトします。
+これは、例えばmy-python-test-libsが自分の管理下のものである場合は、そちらでpandas2.2.3が問題なく使用出来ることをテストしたうえで、依存を更新してしまうことが望ましいです。
+
+```bash
+  Updated ssh://git@xxx.org/my-techorg/my-python-test-libs.git (6gp94f50b4dc39402f612f9df7bdd6aabbc53471)
+  × No solution found when resolving dependencies:
+  ╰─▶ Because your project depends on pandas==2.2.3 and my-python-test-libs==1.4.2 depends on pandas>=1.3.0,<2.0.0, we can
+      conclude that your project and my-python-test-libs==1.4.2 are incompatible.
+      And because only my-python-test-libs==1.4.2 is available and my-python-repo:dev depends on my-python-test-libs, we can conclude that
+      your project and my-python-repo:dev are incompatible.
+      And because your project requires your project and my-python-repo:dev, we can conclude that your project's
+      requirements are unsatisfiable.
+  help: If you want to add the package regardless of the failed resolution, provide the `--frozen` flag to skip locking
+        and syncing.
+```
+
 [^1]: pipも強化されてきてはいるようですが
 
 [^2]: `pip freeze > requirements.lockで` 一応lockファイルも作れるには作れますがまぁやらないですよね...
+
+[^3]: uvも仮想環境としては.venvを使っています（が、意識しなくても使える仕組みになっている）
