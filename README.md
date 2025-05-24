@@ -1,7 +1,8 @@
 # zenn-content
 
-- [アカウントにGitHubリポジトリを連携してZennのコンテンツを管理する](https://zenn.dev/zenn/articles/connect-to-github)
+- [アカウントにGitHubリポジトリを連携してZennのコンテンツを管理する - Zenn](https://zenn.dev/zenn/articles/connect-to-github)
 - [Zenn CLIをインストールする - Zenn](https://zenn.dev/zenn/articles/install-zenn-cli)
+- [ZennのMarkdown記法一覧 - Zenn](https://zenn.dev/zenn/articles/markdown-guide)
 
 ## Zenn CLI
 
