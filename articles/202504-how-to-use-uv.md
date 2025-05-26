@@ -1,5 +1,5 @@
 ---
-title: "日常の開発で使うuv使用方法のエッセンス"
+title: "日常の開発で使うuvのエッセンス"
 emoji: "🐍"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [python, uv]
@@ -9,9 +9,9 @@ published: false
 # 記事概要
 
 Pythonのプロジェクト管理ツールであるuvの使用方法を記載します。
-公式Docから、普段の開発でuvを使うためのエッセンスを抜き出し日本語でまとめたものになります。
+自分は仕事でもプライベートでもPythonプロジェクトではuvを使用しており、普段の開発でよく使うエッセンスを公式Docや自分の経験からまとめてみました。
 なお、内容はv0.6.14時点の内容に準拠します。
-Stableステータスにもなっているので劇的に使い方が変更されることは無いと思いますが最新情報は公式Docを参照ください。
+Stableステータスにもなっているので劇的に使い方が変更されることはあまり無いと思いますが最新情報は公式Docを参照ください。
 
 プロジェクトをuv管理にする動機や方法は以下を参考
 https://zenn.dev/teihenn/articles/202504-how-to-migrate-to-uv
@@ -21,27 +21,27 @@ https://zenn.dev/teihenn/articles/202504-how-to-migrate-to-uv
 uvのみでPythonプロジェクト管理ができ、他のツールは必要ありません。
 
 - プロジェクトで使用するPythonバージョン
-- 依存ライブラリ
-- lockファイル
+- 依存ライブラリ（lockファイルにより環境の完全再現可）
 - 仮想環境
 
 ## Pythonバージョンの管理について
 
 uvはpython本体やバージョンも管理でき、pyenvも置き換え対象と謳っています。
-v0.6.14時点でのuvはプロジェクトごとのPythonバージョンは管理できますが、システムレベルのPythonを管理するものではなく、pyenvを完全に置き換えるものではないです。
-（ただシステムレベルのPythonは基本的に複数要らないかなーと思うので、pyenvももう要らないかと思います。）
+v0.6.14時点でのuvはプロジェクトごとのPythonバージョンは管理できますが、システムレベルのPythonを管理するものではなく、pyenvを完全に置き換えるものではないです（ただシステムレベルのPythonは基本的に複数要らないかなーと思うので、個人的にはpyenvももう無くて良いかと思います）。
 将来的にはシステムレベルのPython管理も対応しようとしています[^1]
 
 ## lockファイルについて
 
-lockファイルとは環境の完全再現に用いるための記録用のファイルで、uvではuv.lockがlockファイルです (uv発の概念というわけではなくnpmなど他言語のパッケージマネージャーでも採用されている概念です)。
+lockファイルとは環境の完全再現に用いるための記録用のファイルで、uvでは`uv.lock`がlockファイルです (uv発の概念というわけではなくnpmなど他言語のパッケージマネージャーでも採用されている概念です)。
 以下のような特徴があります
 
 - 依存の依存までバージョンを管理
 - クロスプラットフォーム対応
 - git管理対象かつ手動編集NG [^2]
 
-uv.lockの中のpandasの例
+pip + requirements.txt でライブラリ管理する場合とは違い、環境の再現性がクロスプラットフォームで有ります。
+
+`uv.lock`の中のpandasの例：
 
 ```
 [[package]]
@@ -75,13 +75,13 @@ wheels = [
 ## 仮想環境
 
 仮想環境は、uv独自の何かではなく、venvを使っているだけです。
-（なので、仮想環境内でPythonを実行するのは、後述の`uv run`ではなく、手動でvenv環境をアクティベートしてpythonコマンドで実行するようなことも可能ではあります(推薦ではない)。）
+（なので、仮想環境内でPythonを実行するのは、後述の`uv run`ではなく、手動でvenv環境をアクティベートして`python`コマンドで実行するようなことも可能ではあります(非推薦)。）
 
-Pythonバージョンは（仮想環境作成時点で）.python-versionに記載のものを使用することになります。
+Pythonバージョンは（仮想環境作成時点で）`.python-version`に記載のものを使用することになります。
 
-# uv管理のプロジェクトでPythonを実行するまでの流れの比較
+# clone〜アプリケーション実行までの流れの比較（uv非使用／uv使用）
 
-uv管理のプロジェクトをgit cloneしてきたあとの流れの例を、uvを使わない場合とともに示してみます。
+uv管理のプロジェクトを`git clone`してきたあとの流れの例を、uvを使わない場合とともに示してみます。
 
 pyenv, pip + requirements.txtで管理していてvenvを直接使う場合は例えば以下のようになります
 
@@ -132,15 +132,14 @@ https://docs.astral.sh/uv/getting-started/features/
 
 https://docs.astral.sh/uv/guides/projects/
 
-`uv init`を使用します。
-`main.py`, `pyproject.toml`, `.python-version`, (存在しなければ)`README.md`が作成されます。
+`uv init`でプロジェクトをuv管理に初期化します。
+`main.py`, `pyproject.toml`, `.python-version`, `README.md`が作成されます。
 
 ```bash
 # Python3.13.2を使うプロジェクトとして初期化する
 uv init -p 3.13.2
 
-# 作成されたmain.pyをuv runで実行すると、
-# 仮想環境とuv.lockも作成される
+# 作成されたmain.pyをuv runで実行すると、仮想環境とuv.lockも作成される
 uv run main.py
 ```
 
@@ -196,8 +195,10 @@ Installed Python 3.13.2 in 1.89s
 
 :::
 
-※ v0.6.14時点では、この方法でインストールしたPythonはそのまま`python`コマンドでは呼び出せず、`uv run`を使うか、`uv venv`で手動で仮想環境を作って`source .venv/bin/activate`し、そのうえで`python`コマンドを使う必要があります。
+:::message
+v0.6.14時点では、この方法でインストールしたPythonはそのまま`python`コマンドでは呼び出せず、`uv run`を使うか、`uv venv`で手動で仮想環境を作って`source .venv/bin/activate`し、そのうえで`python`コマンドを使う必要があります（推薦は後述の`uv run`）。
 https://docs.astral.sh/uv/guides/install-python/#getting-started
+:::
 
 ### `uv`コマンドが使用するPythonバージョンを永続的に変更する
 
@@ -207,7 +208,7 @@ https://docs.astral.sh/uv/reference/cli/#uv-python-pin
 （`.python-version`を書き換えます。）
 
 ```bash
-# 3.13.2を使用する例。
+# 3.13.2を使用する例
 uv python pin 3.13.2
 ```
 
@@ -293,7 +294,7 @@ uv run python -m unittest test/unit/test_main.py
 
 https://docs.astral.sh/uv/concepts/projects/sync/#syncing-the-environment
 
-`uv sync`で、仮想環境の状態をuv.lockの内容に同期出来ます。
+`uv sync`で、仮想環境の状態を`uv.lock`の内容に同期出来ます。
 `uv run`を使えば`uv.lock`の環境でPythonを実行できることが保証されている[^7]ので基本的に`uv sync`を明示的にやる必要はないですが、手動でvenv環境をアクティベートして使いたい場合などがあれば以下のように`uv sync`をしておくと仮想環境の状態を`uv.lock`の内容に同期することが出来ます。
 
 ```bash
@@ -309,8 +310,8 @@ python example.py
 
 https://docs.astral.sh/uv/guides/tools/#running-tools
 
-uvxコマンドで、ツールをインストールせずに実行可能です。
-（実際にはuvx用のtemporaryな環境にインストールされてはいます）
+`uvx`コマンドで、ツールをインストールせずに実行可能です。
+（実際には`uvx`用のtemporaryな環境にインストールされてはいます）
 
 ```bash
 # ruff checkを実行する例
@@ -347,11 +348,11 @@ uv tool install ruff>=0.4
 
 https://docs.astral.sh/uv/getting-started/features/#the-pip-interface
 
-あまり使わないですが、pip互換のCLIにより、手動で環境やパッケージ管理を行うことも可能です。
+あまり使わないですが、pip互換のCLIにより、手動で環境やパッケージ管理を行うことも可能なので一応書いときます。
 pipインタフェースのままuvを使いたいレガシーワークフローや、ハイレベルコマンドでは制御出来ないケースにおいて使用することが想定されています。
 
 :::message
-pipを完全に模倣することを目指しているわけではないため、挙動の違いに遭遇することは有り得ます [^8]
+pipを完全に模倣することを目指しているわけではないため、挙動の違いに遭遇することは有り得ます。 [^8]
 :::
 
 従来の`pip`コマンドの前に、`uv`をつけるだけです。
@@ -369,6 +370,10 @@ uv pip uninstall
 ```bash
 uv venv
 ```
+
+# まとめ
+
+uvの開発体験はとても良いので使ってみてください！
 
 [^1]: https://github.com/astral-sh/uv/issues/6265
 
