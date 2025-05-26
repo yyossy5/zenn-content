@@ -3,7 +3,7 @@ title: "日常の開発で使うuvのエッセンス"
 emoji: "🐍"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [python, uv]
-published: false
+published: true
 ---
 
 # 記事概要
