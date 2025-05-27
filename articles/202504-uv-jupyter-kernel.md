@@ -3,7 +3,7 @@ title: "JupyterNotebookでuvで設定した環境のカーネルを使う"
 emoji: "💨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [python, uv, jupyternotebook]
-published: false
+published: true
 ---
 
 # 記事概要
