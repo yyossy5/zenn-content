@@ -3,7 +3,7 @@ title: "いつものtmux paneレイアウトを楽して開く"
 emoji: "🔧"
 type: "tech"
 topics: ["tmux", "cli", "productivity", "terminal"]
-published: false
+published: true
 ---
 
 ## 概要
